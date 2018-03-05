@@ -1,11 +1,11 @@
 # ROS Environment for AMiRo
-This catkin_ws is a ros environment which contains packages that handle the conversion from the outgoing rsb data (like odometry or laserscaner) from the AMiRo to ros and otherwise to control the AMiRo.
+This repository contains packages that handle the conversion from the outgoing rsb data (like odometry or laserscaner) from the AMiRo to ros and otherwise to control the AMiRo.
 
 ## How To
 Make sure that you sourced the setup.bash like 'source devel/setup.bash'. Otherwise ros doesn't know the environment.
 There are several parameter you have to adapt to your scenario in the 'start.launch'.
 
-#####Parameter start.launch
+### Parameter start.launch
 |         Name         | Default |                                                         Description                                                          |
 | -------------------- | ------- | ---------------------------------------------------------------------------------------------------------------------------- |
 | rostimenow           | false   | If this is set to true ros::time::now will be used as timestmap otherwise the timestmap will be converted from the rsb data. |
@@ -19,7 +19,7 @@ There are several parameter you have to adapt to your scenario in the 'start.lau
 | dynamic_tf_with_ekf  | 0       | the same as dynamic-tf_with_odom but with the ekf data.                                                                      |
 | static_tf_map_odom   | 0       | defines a static transform between map and amiro_odom                                                                        |
 
-As default there are only converter for one AMiRo. If you want to add more AMiRo you ahve to edit the 'start.launch' and copy a block of the 'amiro.launch' as following and add it under:
+As default there are only converter for one AMiRo. If you want to add more AMiRo you have to edit the 'start.launch' and copy a block of the 'amiro.launch' as following and add it under:
 ```
 <include file="$(env MUROX_ROS)/amiro.launch">
   <arg name="amiroNr" value="1"/>
@@ -52,7 +52,7 @@ As default there are only converter for one AMiRo. If you want to add more AMiRo
 </include>
 ```
 
-#####Parameter amiro.launch
+### Parameter amiro.launch
 |         Name         | Default |                                                   Description                                                   |
 | -------------------- | ------- | --------------------------------------------------------------------------------------------------------------- |
 | amiroNr              | 1       | Set the amiroId as namespace for all bridges.                                                                   |
@@ -75,5 +75,3 @@ As default there are only converter for one AMiRo. If you want to add more AMiRo
 | octomap              | 0       | Toggle the ros package octomap with creates a map from the AMiRo odometry or the combined ekf data.             |
 | gmapping             | 0       | Toggle SLAM'ing with the ros package gmapping.                                                                  |
 
-### MapEvaluation
-There is also a detailed custom coded package to evaluate the creates maps from the mapping algorithms. This contains also a README.md for more informations.

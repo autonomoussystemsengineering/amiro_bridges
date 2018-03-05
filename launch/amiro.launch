@@ -1,0 +1,96 @@
+<launch>
+  <arg name="rostimenow" default="false"/>
+  <arg name="amiroNr" default="1"/>
+  <arg name="markerId" default="1"/>
+  <arg name="laserscan" default="0"/>
+  <arg name="laserscan_sick" default="0"/>
+  <arg name="laserscan_hokuyo" default="0"/>
+  <arg name="camera" default="0"/>
+  <arg name="twb" default="0"/>
+  <arg name="xbox_controller" default="0"/>
+
+  <!-- ################################################# -->
+  <!-- Generate the clock scope from a any topic on /amiro1 -->
+  <!-- ################################################# -->
+  <group if="$(arg rostimenow)">
+    <param name="use_sim_time" value="$(arg rostimenow)"/>
+    <node pkg="rsb_to_ros_bridge" type="event_to_ros_clock" name="event_to_ros_clock" output="screen">
+      <param name="use_rsb_send_time" value="1"/>
+      <param name="scope_rsb" value="/amiro$(arg amiroNr)/"/>
+    </node>
+  </group>
+
+
+  <!-- ################################################# -->
+  <!-- rsb_to_ros_bridge -->
+  <!-- ################################################# -->
+
+  <group if="$(arg camera)">
+    <node name="rst_vision_image_to_ros_sensormsgs_image$(arg amiroNr)" pkg="rsb_to_ros_bridge" type="rst_vision_image_to_ros_sensormsgs_image" respawn="false" output="screen" cwd="ROS_HOME" clear_params="true">
+      <param name="rsb_listener_scope" value="amiro$(arg amiroNr)/image/depth"/>
+      <param name="ros_publish_image_topic" value="amiro/$(arg amiroNr)/image"/>
+      <param name="ros_publish_Compressed_image_topic" value="amiro$(arg amiroNr)/image/compressed"/>
+      <param name="image_compression_format" value="jpg"/>
+      <param name="rostimenow" value="$(arg rostimenow)"/>
+    </node>
+  </group>
+  <group if="$(arg twb)">
+    <node name="rsb_twb_to_ros_navmsgs_odometry$(arg amiroNr)" pkg="rsb_to_ros_bridge" type="rsb_twb_to_ros_navmsgs_odometry" respawn="false" output="screen" cwd="ROS_HOME" clear_params="true">
+      <param name="rsb_listener_scope" value="/tracking/merger"/>
+      <param name="ros_publish_topic" value="/tracking/$(arg markerId)"/>
+      <param name="marker_id" value="$(arg markerId)"/>
+      <param name="rostimenow" value="$(arg rostimenow)"/>
+    </node>
+  </group>
+
+  <node name="rst_pose_to_ros_navmsgs_odometry$(arg amiroNr)" pkg="rsb_to_ros_bridge" type="rst_pose_to_ros_navmsgs_odometry" respawn="false" output="screen" cwd="ROS_HOME" clear_params="true">
+    <param name="rsb_listener_scope" value="/amiro$(arg amiroNr)/pose"/>
+    <param name="ros_publish_topic" value="/amiro$(arg amiroNr)/odom"/>
+    <param name="rostimenow" value="$(arg rostimenow)"/>
+  </node>
+  <!-- rst_pose_to_ros_posestamped is depricated! rst_pose_to_ros_navmsgs_odometry is a better version -->
+  <!-- <node name="rst_pose_to_ros_posestamped$(arg amiroNr)" pkg="rsb_to_ros_bridge" type="rst_pose_to_ros_posestamped" respawn="false" output="screen" cwd="ROS_HOME" clear_params="true">
+    <param name="rsb_listener_scope" value="/pose"/>
+    <param name="ros_publish_topic" value="/pose"/>
+    <param name="rostimenow" value="$(arg rostimenow)"/>
+  </node> -->
+  <!-- <node name="rst_value_array_to_ros_int_array" pkg="rsb_to_ros_bridge" type="rst_value_array_to_ros_int_array" respawn="false" output="screen" cwd="ROS_HOME" clear_params="true">
+    <param name="rsb_listener_scope" value="/rir_prox/original"/>
+    <param name="ros_publish_topic" value="/rir_prox"/>
+    <param name="rostimenow" value="$(arg rostimenow)"/>
+  </node> -->
+  <group if="$(arg laserscan)">
+    <node name="rst_vision_laserscan_to_ros_sensormsgs_Laserscan$(arg amiroNr)" pkg="rsb_to_ros_bridge" type="rst_vision_laserscan_to_ros_sensormsgs_Laserscan" respawn="false" output="screen" cwd="ROS_HOME" clear_params="true">
+      <param name="rsb_listener_scope" value="/amiro$(arg amiroNr)/laserscan"/>
+      <param name="ros_publish_topic" value="/amiro$(arg amiroNr)/laserscan"/>
+      <param name="offset_scan" value="-2.35619" if="$(arg laserscan_sick)"/>
+      <param name="offset_scan" value="-2.0944" if="$(arg laserscan_hokuyo)"/>
+      <param name="rostimenow" value="$(arg rostimenow)"/>
+    </node>
+  </group>
+
+  <!-- ################################################# -->
+  <!-- ros_to_rsb_bridge -->
+  <!-- ################################################# -->
+
+  <!-- <node name="ros_geometry_msgs_posestamped_to_rst_geometry_pose$(arg amiroNr)" pkg="ros_to_rsb_bridge" type="ros_geometry_msgs_posestamped_to_rst_geometry_pose" respawn="false" output="screen" cwd="ROS_HOME" clear_params="true">
+    <param name="ros_listener_topic" value="amiro$(arg amiroNr)/pose"/>
+    <param name="rsb_publish_scope" value="amiro$(arg amiroNr)/pose"/>
+  </node> -->
+  <group if="$(arg xbox_controller)">
+    <node name="xbox_controller_bridge$(arg amiroNr)" pkg="ros_to_rsb_bridge" type="ros_geometry_msgs_twist_to_rst_value_array" respawn="false" output="screen" cwd="ROS_HOME">
+      <param name="ros_listener_topic" value="/teleop_velocity_smoother/raw_cmd_vel"/>
+      <param name="rsb_publish_scope" value="/amiro$(arg amiroNr)/motor/5"/>
+    </node>
+  </group>
+
+  <group if="$(arg nav_stack)">
+    <node name="Navstack_controll_bridge$(arg amiroNr)" pkg="ros_to_rsb_bridge" type="ros_geometry_msgs_twist_to_rst_value_array" respawn="false" output="screen" cwd="ROS_HOME" clear_params="true">
+      <param name="ros_listener_topic" value="/amiro$(arg amiroNr)/cmd_vel"/>
+      <param name="rsb_publish_scope" value="/amiro$(arg amiroNr)/motor/10"/>
+    </node>
+  </group>
+  
+  <node pkg="tf" type="static_transform_publisher" name="amiro$(arg amiroNr)_base_link_base_laser" args="0 0 0.167 0 0 0 amiro$(arg amiroNr)/base_link amiro$(arg amiroNr)/base_laser 100"/>
+
+</launch>
