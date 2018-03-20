@@ -11,10 +11,6 @@
 
 // RSB
 #include <rsb/Factory.h>
-#include <rsb/Version.h>
-#include <rsb/Event.h>
-#include <rsb/Handler.h>
-#include <rsb/MetaData.h>
 #include <rsb/converter/Repository.h>
 #include <rsb/converter/ProtocolBufferConverter.h>
 

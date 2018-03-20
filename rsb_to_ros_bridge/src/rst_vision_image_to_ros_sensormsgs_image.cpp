@@ -15,10 +15,6 @@
 
 // RSB
 #include <rsb/Factory.h>
-#include <rsb/Version.h>
-#include <rsb/Event.h>
-#include <rsb/Handler.h>
-#include <rsb/MetaData.h>
 #include <rsb/converter/Repository.h>
 #include <rsb/converter/ProtocolBufferConverter.h>
 
@@ -51,6 +47,7 @@ static ros::Publisher compressedImagePublisher;
 const string programName = "rst_vision_image_to_ros_sensormsgs_image";
 
 bool rostimenow;
+string frameId(""), genericFrameIdSuffix("");
 
 static string imageCompressionFormat;
 
@@ -82,7 +79,7 @@ void processImage(rsb::EventPtr event) {
     void * t = static_cast<void *>(const_cast<unsigned char *>(reinterpret_cast<const unsigned char *>(&image->data()[0])));
     cv::Mat img(image->height(), image->width(), encodingCv, t);
     cvImage.header.stamp    = getRosTimeFromRsbEvent(event);
-    cvImage.header.frame_id = event->getScope().getComponents()[0] + "/base_cam";
+    cvImage.header.frame_id = frameId.empty() ? event->getScope().getComponents()[0] + genericFrameIdSuffix : frameId;
     cvImage.encoding        = encodingCvBridge;
     cvImage.image = img;
     sensor_msgs::ImagePtr msg = cvImage.toImageMsg();
@@ -125,12 +122,16 @@ int main(int argc, char * argv[]) {
   node.param<string>("ros_publish_Compressed_image_topic", rosPublishCompressedImageTopic, "/image/compressed");
   node.param<string>("image_compression_format", imageCompressionFormat, "jpg");
   node.param<bool>("rostimenow", rostimenow, false);
+  node.param<string>("frame_id", frameId, "");
+  node.param<string>("generic_frame_id_suffix", genericFrameIdSuffix, "/base_cam");
 
   ROS_INFO("rsb_listener_scope: %s", rsbListenerScope.c_str());
   ROS_INFO("ros_publish_image_topic: %s", rosPublishImageTopic.c_str());
   ROS_INFO("ros_publish_Compressed_image_topic: %s", rosPublishCompressedImageTopic.c_str());
   ROS_INFO("image_compression_format: %s", imageCompressionFormat.c_str());
   ROS_INFO("rostimenow: %s", rostimenow?"True":"False");
+  ROS_INFO("frameId: %s", frameId.c_str());
+  ROS_INFO("genericFrameIdSuffix: %s", genericFrameIdSuffix.c_str());
 
   image_transport::ImageTransport imageTransport(node);
   imagePublisher = imageTransport.advertise(rosPublishImageTopic, 1);

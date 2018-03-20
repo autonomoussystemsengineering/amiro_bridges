@@ -10,17 +10,12 @@
 
 // RSB
 #include <rsb/Factory.h>
-#include <rsb/Version.h>
-#include <rsb/Event.h>
-#include <rsb/Handler.h>
-#include <rsb/MetaData.h>
 #include <rsb/converter/Repository.h>
 #include <rsb/converter/ProtocolBufferConverter.h>
 
 // RST
 #include <rst/geometry/Pose.pb.h>
 
-// #include "rsb_to_ros_time_converter.hpp"
 #include <rsb_to_ros_bridge/rsb_to_ros_time_converter.h>
 
 using namespace std;
@@ -37,7 +32,7 @@ ros::Publisher rosPosePub;
 const string programName = "rst_pose_to_ros_navmsgs_odometry";
 
 bool rostimenow;
-
+string frameId(""), genericFrameIdSuffix("");
 
 void processRstGeometryPose(rsb::EventPtr event) {
   if (event->getType() != "rst::geometry::Pose") {
@@ -59,7 +54,7 @@ void processRstGeometryPose(rsb::EventPtr event) {
   odom.pose.pose.position.z    = (double) t.z();
   // odom.header.stamp.nsec  = event->getMetaData().getCreateTime() * 1000;
   odom.header.stamp    = getRosTimeFromRsbEvent(event,rostimenow);
-  odom.header.frame_id = event->getScope().getComponents()[0] + "/odom";
+  odom.header.frame_id = frameId.empty() ? event->getScope().getComponents()[0] + genericFrameIdSuffix : frameId;
 
   rosPosePub.publish(odom);
 }
@@ -74,12 +69,14 @@ int main(int argc, char * argv[]) {
   node.param<string>("rsb_listener_scope", rsbListenerScope, "/pose");
   node.param<string>("ros_publish_topic", rosPublishTopic, "/pose");
   node.param<bool>("rostimenow", rostimenow, false);
+  node.param<string>("frame_id", frameId, "");
+  node.param<string>("generic_frame_id_suffix", genericFrameIdSuffix, "/odom");
 
   ROS_INFO("rsb_listener_scope: %s", rsbListenerScope.c_str());
   ROS_INFO("ros_publish_topic: %s", rosPublishTopic.c_str());
   ROS_INFO("rostimenow: %s", rostimenow?"True":"False");
-
-  cout << "asdadwa d " << rsbListenerScope << endl;
+  ROS_INFO("frameId: %s", frameId.c_str());
+  ROS_INFO("genericFrameIdSuffix: %s", genericFrameIdSuffix.c_str());
 
   rosPosePub = node.advertise<nav_msgs::Odometry>(rosPublishTopic, 1);
 

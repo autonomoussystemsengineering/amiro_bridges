@@ -5,9 +5,9 @@
 
 // RSB
 #include <rsb/Factory.h>
+#include <rsb/MetaData.h>
 #include <rsb/converter/Repository.h>
 #include <rsb/converter/ProtocolBufferConverter.h>
-#include <rsb/MetaData.h>
 
 // RST
 #include <rst/vision/LaserScan.pb.h>

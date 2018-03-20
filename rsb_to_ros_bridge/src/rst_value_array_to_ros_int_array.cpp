@@ -11,10 +11,6 @@
 
 // RSB
 #include <rsb/Factory.h>
-#include <rsb/Version.h>
-#include <rsb/Event.h>
-#include <rsb/Handler.h>
-#include <rsb/MetaData.h>
 #include <rsb/converter/Repository.h>
 #include <rsb/converter/ProtocolBufferConverter.h>
 
@@ -35,6 +31,7 @@ string rosPublishProximityTopic;
 ros::Publisher floorProxPub;
 
 bool rostimenow;
+string frameId(""), genericFrameIdSuffix("");
 
 // program name
 const string programName = "rst_value_array_to_ros_int_array";
@@ -77,8 +74,8 @@ void processValueArray(rsb::EventPtr event) {
   amiro_msgs::Int32MultiArrayStamped proxMsg;
   proxMsg.array.data       = data;
   proxMsg.array.layout     = layout;
-  proxMsg.header.stamp    = getRosTimeFromRsbEvent(event,rostimenow);
-  proxMsg.header.frame_id = event->getScope().getComponents()[0] + "/base_prox";
+  proxMsg.header.stamp     = getRosTimeFromRsbEvent(event,rostimenow);
+  proxMsg.header.frame_id  = frameId.empty() ? event->getScope().getComponents()[0] + genericFrameIdSuffix : frameId;
 
   floorProxPub.publish(proxMsg);
 } // processValueArray
@@ -96,6 +93,10 @@ int main(int argc, char * argv[]) {
   ROS_INFO("ros_publish_topic: %s", rosPublishProximityTopic.c_str());
   node.param<bool>("rostimenow", rostimenow, false);
   ROS_INFO("rostimenow: %s", rostimenow?"True":"False");
+  node.param<string>("frame_id", frameId, "");
+  ROS_INFO("frameId: %s", frameId.c_str());
+  node.param<string>("generic_frame_id_suffix", genericFrameIdSuffix, "/base_prox");
+  ROS_INFO("genericFrameIdSuffix: %s", genericFrameIdSuffix.c_str());
 
   floorProxPub = node.advertise<amiro_msgs::Int32MultiArrayStamped>(rosPublishProximityTopic, 1);
 

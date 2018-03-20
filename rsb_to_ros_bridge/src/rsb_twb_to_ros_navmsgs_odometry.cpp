@@ -10,10 +10,6 @@
 
 // RSB
 #include <rsb/Factory.h>
-#include <rsb/Version.h>
-#include <rsb/Event.h>
-#include <rsb/Handler.h>
-#include <rsb/MetaData.h>
 #include <rsb/converter/Repository.h>
 #include <rsb/converter/ProtocolBufferConverter.h>
 
@@ -41,6 +37,7 @@ const string programName = "rsb_twb_to_ros_navmsgs_odometry";
 
 //
 bool rostimenow;
+string frameId, childFrameIdPrefix, childFrameIdSuffix;
 
 /**
  * @brief Conversion Euler angles to Quaternion
@@ -81,9 +78,9 @@ void processTwbTrackingProtoObjectList(rsb::EventPtr event) {
     euler2Quaternion(rotEuler,
       rotQuat);
     nav_msgs::Odometry odom;
-    odom.header.frame_id         = "map";
+    odom.header.frame_id         = frameId;
     odom.header.stamp            = getRosTimeFromRsbEvent(event, rostimenow);
-    odom.child_frame_id          = std::string("amiro") + std::to_string(obj.id()) + std::string("/base_link");
+    odom.child_frame_id          = childFrameIdPrefix + std::to_string(obj.id()) + childFrameIdSuffix;
     odom.pose.pose.position.x    = obj.position().translation().x();
     odom.pose.pose.position.y    = obj.position().translation().y();
     odom.pose.pose.position.z    = obj.position().translation().z();
@@ -119,6 +116,12 @@ int main(int argc, char * argv[]) {
   ROS_INFO("rostimenow: %s", rostimenow ? "True" : "False");
   node.param<int>("marker_id", markerId, 0);
   ROS_INFO("marker_id: %d", markerId);
+  node.param<string>("frame_id", frameId, "map");
+  ROS_INFO("frame_id: %s", frameId.c_str());
+  node.param<string>("child_frame_id_prefix", childFrameIdPrefix, "amiro");
+  ROS_INFO("child_frame_id_prefix: %s", childFrameIdPrefix.c_str());
+  node.param<string>("child_frame_id_suffix", childFrameIdSuffix, "/base_link");
+  ROS_INFO("child_frame_id_suffix: %s", childFrameIdSuffix.c_str());
 
   rosPosePub = node.advertise<nav_msgs::Odometry>(rosPublishPoseStamped, 1);
 
