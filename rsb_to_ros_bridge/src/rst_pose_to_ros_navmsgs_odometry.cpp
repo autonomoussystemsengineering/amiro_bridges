@@ -32,7 +32,7 @@ ros::Publisher rosPosePub;
 const string programName = "rst_pose_to_ros_navmsgs_odometry";
 
 bool rostimenow;
-string frameId(""), genericFrameIdSuffix("");
+string frameId(""), genericFrameIdSuffix(""),childFrameId("");
 
 void processRstGeometryPose(rsb::EventPtr event) {
   if (event->getType() != "rst::geometry::Pose") {
@@ -52,9 +52,9 @@ void processRstGeometryPose(rsb::EventPtr event) {
   odom.pose.pose.position.x    = (double) t.x();
   odom.pose.pose.position.y    = (double) t.y();
   odom.pose.pose.position.z    = (double) t.z();
-  // odom.header.stamp.nsec  = event->getMetaData().getCreateTime() * 1000;
-  odom.header.stamp    = getRosTimeFromRsbEvent(event,rostimenow);
-  odom.header.frame_id = frameId.empty() ? event->getScope().getComponents()[0] + genericFrameIdSuffix : frameId;
+  odom.header.stamp            = getRosTimeFromRsbEvent(event,rostimenow);
+  odom.header.frame_id         = frameId.empty() ? event->getScope().getComponents()[0] + genericFrameIdSuffix : frameId;
+  odom.child_frame_id          = childFrameId;
 
   rosPosePub.publish(odom);
 }
@@ -71,12 +71,14 @@ int main(int argc, char * argv[]) {
   node.param<bool>("rostimenow", rostimenow, false);
   node.param<string>("frame_id", frameId, "");
   node.param<string>("generic_frame_id_suffix", genericFrameIdSuffix, "/odom");
+  node.param<string>("child_frame_id", childFrameId, "/base_link");
 
   ROS_INFO("rsb_listener_scope: %s", rsbListenerScope.c_str());
   ROS_INFO("ros_publish_topic: %s", rosPublishTopic.c_str());
   ROS_INFO("rostimenow: %s", rostimenow?"True":"False");
   ROS_INFO("frameId: %s", frameId.c_str());
   ROS_INFO("genericFrameIdSuffix: %s", genericFrameIdSuffix.c_str());
+  ROS_INFO("child_frame_id: %s", childFrameId.c_str());
 
   rosPosePub = node.advertise<nav_msgs::Odometry>(rosPublishTopic, 1);
 
