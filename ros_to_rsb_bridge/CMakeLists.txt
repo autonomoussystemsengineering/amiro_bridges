@@ -22,7 +22,7 @@ catkin_package(
 #  INCLUDE_DIRS include
 #  LIBRARIES ros_to_rsb_bridge
 #  CATKIN_DEPENDS roscpp std_msgs
-#  DEPENDS system_lib
+#  DEPENDS amiro_msgs
 )
 
 include_directories(
@@ -74,4 +74,4 @@ target_link_libraries(ros_geometry_msgs_twist_to_rst_value_array
 )
 
 ADD_DEFINITIONS(${RST_CFLAGS} ${RSTSANDBOX_CFLAGS})
-add_dependencies(ros_int_multiarray_rst_value_array amiro_msgs_gencpp)
+#add_dependencies(ros_int_multiarray_rst_value_array amiro_msgs_gencpp)
