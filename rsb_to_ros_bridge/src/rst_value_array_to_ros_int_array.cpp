@@ -7,7 +7,7 @@
 // ROS
 #include <ros/ros.h>
 #include <std_msgs/UInt16MultiArray.h>
-#include <amiro_msgs/Int32MultiArrayStamped.h>
+#include <amiro_msgs/UInt16MultiArrayStamped.h>
 
 // RSB
 #include <rsb/Factory.h>
@@ -48,7 +48,7 @@ void processValueArray(rsb::EventPtr event) {
   }
 
   int size = value->array_size();
-  std::vector<int32_t> data(0, 0);
+  std::vector<uint16_t> data(0, 0);
   rst::generic::Value entry;
   for (int i = 0; i < size; i++) {
     entry = value->array(i);
@@ -57,9 +57,9 @@ void processValueArray(rsb::EventPtr event) {
     }
 
     data.push_back(entry.int_());
-    ROS_INFO("%i", data.back());
+    ROS_DEBUG("%i", data.back());
   }
-  ROS_INFO("=======");
+  ROS_DEBUG("=======");
 
   std_msgs::MultiArrayLayout layout;
   std::vector<std_msgs::MultiArrayDimension> dimensions;
@@ -71,7 +71,7 @@ void processValueArray(rsb::EventPtr event) {
   layout.dim = dimensions;
 
 
-  amiro_msgs::Int32MultiArrayStamped proxMsg;
+  amiro_msgs::UInt16MultiArrayStamped proxMsg;
   proxMsg.array.data       = data;
   proxMsg.array.layout     = layout;
   proxMsg.header.stamp     = getRosTimeFromRsbEvent(event,rostimenow);
@@ -98,7 +98,7 @@ int main(int argc, char * argv[]) {
   node.param<string>("generic_frame_id_suffix", genericFrameIdSuffix, "/base_prox");
   ROS_INFO("genericFrameIdSuffix: %s", genericFrameIdSuffix.c_str());
 
-  floorProxPub = node.advertise<amiro_msgs::Int32MultiArrayStamped>(rosPublishProximityTopic, 1);
+  floorProxPub = node.advertise<amiro_msgs::UInt16MultiArrayStamped>(rosPublishProximityTopic, 1);
 
   rsb::Factory& factory = rsb::getFactory();
 

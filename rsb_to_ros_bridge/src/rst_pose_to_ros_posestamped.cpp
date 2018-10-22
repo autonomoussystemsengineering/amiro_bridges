@@ -1,7 +1,7 @@
 // ============================================================================
 // Name        : rst_pose_to_ros_posestamped.cpp
 // Author      : Jonas Dominik Homburg <jhomburg@techfak.uni-bielefeld.de>
-// Description : Recieve int32_t array as Value via rsb and publish them via ros.
+// Description : Receive int32_t array as Value via rsb and publish them via ros.
 // ============================================================================
 
 // ROS

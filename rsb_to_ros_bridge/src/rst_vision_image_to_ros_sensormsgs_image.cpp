@@ -1,7 +1,7 @@
 // ============================================================================
 // Name        : main.cxx
 // Author      : Daniel Rudolph <drudolph@techfak.uni-bielefeld.de>
-// Description : Recieve images via rsb and publish them via ros.
+// Description : Receive images via rsb and publish them via ros.
 // ============================================================================
 
 // ROS

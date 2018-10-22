@@ -7,7 +7,7 @@
 // ROS
 #include <ros/ros.h>
 #include <std_msgs/UInt16MultiArray.h>
-#include <amiro_msgs/Int32MultiArrayStamped.h>
+#include <amiro_msgs/UInt16MultiArrayStamped.h>
 
 // RSB
 #include <rsb/Factory.h>
@@ -31,7 +31,7 @@ rsb::Informer<rst::generic::Value>::Ptr informer;
 const string programName = "ros_int_multiarray_rst_value_array";
 
 
-void process (const amiro_msgs::Int32MultiArrayStamped::ConstPtr& msg){
+void process (const amiro_msgs::UInt16MultiArrayStamped::ConstPtr& msg){
   rsb::Informer<rst::generic::Value>::DataPtr rsbmsg(new rst::generic::Value);
   rsbmsg->set_type(rst::generic::Value::ARRAY);
   rst::generic::Value* nV;
