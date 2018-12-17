@@ -45,10 +45,6 @@ As default there are only converter for one AMiRo. If you want to add more AMiRo
   <arg name="nav_stack" value="0"/>
   <arg name="no_static_map" value="0"/>
 
-  <arg name="hector_mapping" value="0"/>
-  <arg name="octomap" value="0"/>
-  <arg name="gmapping" value="0"/>
-
 </include>
 ```
 
@@ -71,6 +67,3 @@ As default there are only converter for one AMiRo. If you want to add more AMiRo
 | keyboard_controller  | 0       | Toggle the bridges to control the AMiRo with a keyboard.                                                        |
 | nav_stack            | 0       | Toggle the ros navigation stack for the AMiRo.                                                                  |
 | no_static_map        | 0       | If there is a dynamic map while SLAM'ing this has to be set 0 otherwise if there is a static map set this to 1. |
-| hector_mapping       | 0       | Toggle SLAM'ing with the ros package hector_mapping.                                                            |
-| octomap              | 0       | Toggle the ros package octomap with creates a map from the AMiRo odometry or the combined ekf data.             |
-| gmapping             | 0       | Toggle SLAM'ing with the ros package gmapping.                                                                  |

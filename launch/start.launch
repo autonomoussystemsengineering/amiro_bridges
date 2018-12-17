@@ -21,7 +21,7 @@
       <param name="scope_rsb" value="/amiro8/"/>
     </node>
   </group>
-  
+
   <include file="$(env MUROX_ROS)/xbox360_teleop.launch" if="$(arg xboxController)"/>
   <!-- <node name="rqt_topic" pkg="rqt_topic" type="rqt_topic"/> -->
   <node name="rviz1" pkg="rviz" type="rviz" args="-d $(env MUROX_ROS)/config.rviz"/>
@@ -51,10 +51,6 @@
     <arg name="nav_stack" value="0"/>
     <arg name="no_static_map" value="0"/>
     <arg name="frontier_exploration" value="0"/>
-
-    <arg name="hector_mapping" value="1"/>
-    <arg name="octomap" value="0"/>
-    <arg name="gmapping" value="0"/>
 
   </include>
 
