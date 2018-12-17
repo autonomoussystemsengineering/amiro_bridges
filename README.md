@@ -63,7 +63,7 @@ As default there are only converter for one AMiRo. If you want to add more AMiRo
 | camera               | 0       | The the vision bridge for the inbuild AMiRo camera.                                                             |
 | twb                  | 0       | Toggle the bridge for the twb data.                                                                             |
 | robot_localization   | 0       | Toggle the extended kalman filter for AMiRo odometry and twb data.                                              |
-| rostimeno            | 0       | Toggle the header stimestamps of each message with rostimenow or the normal rsb timestamps.                     |
+| rostimenow           | 0       | Toggle the header stimestamps of each message with rostimenow or the normal rsb timestamps.                     |
 | dynamic_tf_with_odom | 0       | This is a dynamic transformer to update the tf from amiro_odom and amiro_base_link with AMiRo odometry data     |
 | dynamic_tf_with_ekf  | 0       | the same as dynamic-tf_with_odom but with the ekf data.                                                         |
 | static_tf_map_odom   | 0       | defines a static transform between map and amiro_odom                                                           |
@@ -74,4 +74,3 @@ As default there are only converter for one AMiRo. If you want to add more AMiRo
 | hector_mapping       | 0       | Toggle SLAM'ing with the ros package hector_mapping.                                                            |
 | octomap              | 0       | Toggle the ros package octomap with creates a map from the AMiRo odometry or the combined ekf data.             |
 | gmapping             | 0       | Toggle SLAM'ing with the ros package gmapping.                                                                  |
-
