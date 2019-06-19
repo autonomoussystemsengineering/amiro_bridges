@@ -74,4 +74,4 @@ target_link_libraries(ros_geometry_msgs_twist_to_rst_value_array
 )
 
 ADD_DEFINITIONS(${RST_CFLAGS} ${RSTSANDBOX_CFLAGS})
-#add_dependencies(ros_int_multiarray_rst_value_array amiro_msgs_gencpp)
+add_dependencies(ros_int_multiarray_rst_value_array amiro_msgs_gencpp)

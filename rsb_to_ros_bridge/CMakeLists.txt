@@ -120,6 +120,5 @@ target_link_libraries(event_to_ros_clock
 )
 
 ADD_DEFINITIONS(${RST_CFLAGS} ${RSTSANDBOX_CFLAGS})
-
 add_dependencies(rst_vision_image_to_ros_sensormsgs_image amiro_msgs_gencpp)
 add_dependencies(rst_value_array_to_ros_int_array amiro_msgs_gencpp)
