@@ -1,11 +1,17 @@
-# ROS Environment for AMiRo
-This repository contains packages that handle the conversion from the outgoing rsb data (like odometry or laserscaner) from the AMiRo to ros and otherwise to control the AMiRo.
+# AMiRo Bridges
+
+This ROS package contains conversions (aka brdiges) from RSB (Robotics Service Bus) to ROS (Robot Operating System) messages and vice versa.
+E.g. the robot's outgoing RSB message, like odometry or laserscans, are converted to ROS messages.
+Vice verse, ROS based control messages from turtlebot_teleop are converted to RSB messages and send to the robot.
+
 
 ## How To
+
 Make sure that you sourced the setup.bash like 'source devel/setup.bash'. Otherwise ros doesn't know the environment.
 There are several parameter you have to adapt to your scenario in the 'start.launch'.
 
 ### Parameter start.launch
+
 |         Name         | Default |                                                         Description                                                          |
 | -------------------- | ------- | ---------------------------------------------------------------------------------------------------------------------------- |
 | rostimenow           | false   | If this is set to true ros::time::now will be used as timestmap otherwise the timestmap will be converted from the rsb data. |
@@ -49,6 +55,7 @@ As default there are only converter for one AMiRo. If you want to add more AMiRo
 ```
 
 ### Parameter amiro.launch
+
 |         Name         | Default |                                                   Description                                                   |
 | -------------------- | ------- | --------------------------------------------------------------------------------------------------------------- |
 | amiroNr              | 1       | Set the amiroId as namespace for all bridges.                                                                   |
@@ -67,3 +74,21 @@ As default there are only converter for one AMiRo. If you want to add more AMiRo
 | keyboard_controller  | 0       | Toggle the bridges to control the AMiRo with a keyboard.                                                        |
 | nav_stack            | 0       | Toggle the ros navigation stack for the AMiRo.                                                                  |
 | no_static_map        | 0       | If there is a dynamic map while SLAM'ing this has to be set 0 otherwise if there is a static map set this to 1. |
+
+### Some useful commands
+
+```
+ros_int_multiarray_rst_value_array debug for actAmiroLight:
+rostopic pub -r 1 /lights sai_msgs/Int32MultiArrayStamped '{data: {data: [255,0,0,0,255,0,0,0,255,255,127,0,255,255,0,127,0,127,0,127,127,255,255,255,75]}}'
+  rainbow lightring: 50%
+  rostopic pub -r 1 /lights sai_msgs/Int32MultiArrayStamped '{data: {data: [255,0,0,255,127,0,127,127,0,127,255,0,0,255,0,0,127,127,0,0,255,127,0,127,50]}}'
+ros_int_multiarray_rst_value_array debug for actAmiroMotor:
+rostopic pub -r 1 /motor sai_msgs/Int32MultiArrayStamped '{data: {data: [10000,10000]}}'
+motorControl:
+rostopic pub /motor sai_msgs/Int32MultiArrayStamped '{data: {data: [100000,-2000000,1000000]}}'
+setLights:
+rostopic pub /lights sai_msgs/Int32MultiArrayStamped '{data: {data: [5,255,0,0,1000]}}'
+actPoseToTargetPosition:
+rostopic pub /pose geometry_msgs/PoseStamped '{header: {stamp: now, frame_id: "map"}, pose: {position: {x: 1.0, y: 0.0, z: 0.0}, orientation: {w: 1.0}}}'
+```
+
