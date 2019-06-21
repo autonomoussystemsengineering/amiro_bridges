@@ -84,7 +84,7 @@ void processRstMessage(rsb::EventPtr event) {
    * layout.dim=dimensions;
    *
    *
-   * sai_msgs::Int32MultiArrayStamped proxMsg;
+   * amiro_msgs::Int32MultiArrayStamped proxMsg;
    * proxMsg.data.data=data;
    * proxMsg.data.layout=layout;
    * proxMsg.header.stamp.nsec=event->getMetaData().getCreateTime()*1000;

@@ -75,20 +75,80 @@ As default there are only converter for one AMiRo. If you want to add more AMiRo
 | nav_stack            | 0       | Toggle the ros navigation stack for the AMiRo.                                                                  |
 | no_static_map        | 0       | If there is a dynamic map while SLAM'ing this has to be set 0 otherwise if there is a static map set this to 1. |
 
-### Some useful commands
+## Some useful commands
+
+## Preconditions on AMiRo
+
+* Working network connection
+* correct `rsb.conf` configuration
+
+AMiRo as host with IP `192.168.3.1`:
+```
+[transport.spread]
+enabled = 0
+
+[transport.inprocess]
+enabled = 0
+
+[transport.socket]
+enabled = 1
+server = 1
+port = 55555
+host = 192.168.3.1
+```
+
+PC as client with IP `192.168.3.2`:
+```
+[transport.spread]
+enabled = 0
+
+[transport.inprocess]
+enabled = 0
+
+[transport.socket]
+enabled = 1
+server = 0
+port = 55555
+host = 192.168.3.1
+```
+
+### Running executables on AMiRo that converst RSB to CAN messages
 
 ```
-ros_int_multiarray_rst_value_array debug for actAmiroLight:
-rostopic pub -r 1 /lights sai_msgs/Int32MultiArrayStamped '{data: {data: [255,0,0,0,255,0,0,0,255,255,127,0,255,255,0,127,0,127,0,127,127,255,255,255,75]}}'
-  rainbow lightring: 50%
-  rostopic pub -r 1 /lights sai_msgs/Int32MultiArrayStamped '{data: {data: [255,0,0,255,127,0,127,127,0,127,255,0,0,255,0,0,127,127,0,0,255,127,0,127,50]}}'
-ros_int_multiarray_rst_value_array debug for actAmiroMotor:
-rostopic pub -r 1 /motor sai_msgs/Int32MultiArrayStamped '{data: {data: [10000,10000]}}'
-motorControl:
-rostopic pub /motor sai_msgs/Int32MultiArrayStamped '{data: {data: [100000,-2000000,1000000]}}'
-setLights:
-rostopic pub /lights sai_msgs/Int32MultiArrayStamped '{data: {data: [5,255,0,0,1000]}}'
-actPoseToTargetPosition:
-rostopic pub /pose geometry_msgs/PoseStamped '{header: {stamp: now, frame_id: "map"}, pose: {position: {x: 1.0, y: 0.0, z: 0.0}, orientation: {w: 1.0}}}'
+# Set lights
+./setLights -c /amiro/lights
+# Drive to pose (do not use with actAmiroMotor)
+./actTargetPosition -i /amiro/pose
+# Drive directly (do not use with actTargetPosition)
+./actAmiroMotor -i /amiro/motor
 ```
+
+### Running bridges on PC
+
+```
+# Bridge light messages
+rosrun ros_to_rsb_bridge ros_int_multiarray_rst_value_array _ros_listener_topic:=/amiro/pose _rsb_publish_scope:=/amiro/pose
+# Bridge pose messages
+rosrun ros_to_rsb_bridge ros_geometry_msgs_twist_to_rst_value_array _ros_listener_topic:=/amiro/motor _rsb_publish_scope:=/amiro/motor
+# Bridge twist messages
+rosrun ros_to_rsb_bridge ros_geometry_msgs_posestamped_to_rst_geometry_pose _ros_listener_topic:=/amiro/pose _rsb_publish_scope:=/amiro/pose
+```
+
+### Example commands on PC
+
+* Lightning (Every data looks like `[mode, R, G, B, period]` or `[mode, R_1, G_1, B_1, ..., R_8, G_8, B_8, period]`
+  * Initial coloring (nor RGB necessary): `rostopic pub -r 1 /lights amiro_msgs/UInt16MultiArrayStamped '{array: {data: [0,0]}}'`
+  * Specific coloring (Period does not care): `rostopic pub -r 1 /lights amiro_msgs/UInt16MultiArrayStamped '{array: {data: [1,255,0,0,0,255,0,0,0,255,255,127,0,255,255,0,127,0,127,0,127,127,255,255,255,0]}}'`
+  * Green full blink with 500ms (Period does care): `rostopic pub /lights amiro_msgs/UInt16MultiArrayStamped '{array: {data: [2,0,255,0,500]}}'`
+  * Blue left/right blink with 1s (Period does care): `rostopic pub /lights amiro_msgs/UInt16MultiArrayStamped '{array: {data: [3,0,0,255,1000]}}'`
+  * White quad-blink with 1s (Period does care): `rostopic pub /lights amiro_msgs/UInt16MultiArrayStamped '{array: {data: [4,255,255,255,1000]}}'`
+  * Red ring (Period does not care): `rostopic pub /lights amiro_msgs/UInt16MultiArrayStamped '{array: {data: [5,255,0,0,0]}}'`
+  * Red ring-reverse (Period does not care): `rostopic pub /lights amiro_msgs/UInt16MultiArrayStamped '{array: {data: [6,255,0,0,0]}}'`
+  * Initial color blink with 100ms (Period does not care): `rostopic pub /lights amiro_msgs/UInt16MultiArrayStamped '{array: {data: [7,100]}}'`
+  * Specific color (blue/white/red) blink with 100ms (Period does not care): `rostopic pub /lights amiro_msgs/UInt16MultiArrayStamped '{array: {data: [8,0,0,255,255,255,255,255,0,0,1000]}}'`
+  * ... (all other commands but with specific colors)
+* Driving
+  * Drive a circle with .1m/s and 1rad/s: `rostopic pub /amiro/motor geometry_msgs/Twist "{linear: {x: 0.1, y: 0.0, z: 0.0}, angular: {x: 0.0, y: 0.0, z: 1.0}}"`
+  * Drive to relative poistition: `rostopic pub /amiro/pose geometry_msgs/PoseStamped '{header: {stamp: now, frame_id: "map"}, pose: {position: {x: 1.0, y: 0.0, z: 0.0}, orientation: {w: 1.0}}}'`
+
 

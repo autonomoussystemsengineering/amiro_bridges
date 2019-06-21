@@ -90,6 +90,11 @@
       <param name="rsb_publish_scope" value="/amiro$(arg amiroNr)/motor/10"/>
     </node>
   </group>
+
+  <node name="light_bridge$(arg amiroNr)" pkg="ros_to_rsb_bridge" type="ros_int_multiarray_rst_value_array" respawn="true" output="screen" cwd="ROS_HOME" clear_params="true">
+    <param name="ros_listener_topic" value="/amiro$(arg amiroNr)/lights"/>
+    <param name="rsb_publish_scope" value="/amiro$(arg amiroNr)/lights"/>
+  </node>
   
   <node pkg="tf" type="static_transform_publisher" name="amiro$(arg amiroNr)_base_link_base_laser" args="0 0 0.167 0 0 0 amiro$(arg amiroNr)/base_link amiro$(arg amiroNr)/base_laser 100"/>
 
